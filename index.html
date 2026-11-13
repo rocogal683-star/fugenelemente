@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fugenelemente – Interaktive Präsentation</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --primary: #1e3a8a;
+      --primary-light: #dbeafe;
+      --accent: #e11d48;
+      --accent-soft: #ffe4e6;
+      --teal: #0f766e;
+      --teal-soft: #ccfbf1;
+      --amber: #b45309;
+      --amber-soft: #fef3c7;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #f1f5f9 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Header */
+    header {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.05rem;
+    }
+
+    .brand-badge {
+      background: var(--primary);
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .toggle-btn {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .toggle-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .toggle-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .slide-counter {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface-soft);
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+    }
+
+    /* Progress Bar */
+    .progress-track {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 20%;
+      transition: width 0.35s ease;
+    }
+
+    /* Main Slide Container */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.75rem;
+    }
+
+    .deck {
+      width: 100%;
+      max-width: 1120px;
+      position: relative;
+    }
+
+    .slide {
+      display: none;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+      min-height: 560px;
+      animation: fadeSlide 0.35s ease;
+    }
+
+    .slide.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-tag {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--primary);
+      background: var(--primary-light);
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      line-height: 1.15;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 1.4rem;
+    }
+
+    /* Slide 1 Hero */
+    .hero-box {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #fff;
+      border-radius: 16px;
+      padding: 2.2rem 2.5rem;
+      margin: 0.5rem 0 1.5rem;
+      box-shadow: 0 10px 25px rgba(30, 58, 138, 0.2);
+    }
+
+    .hero-box h1 {
+      color: #fff;
+      font-size: 2.8rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .hero-question {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fde047;
+      margin-top: 1.25rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-definition {
+      font-size: 1.25rem;
+      line-height: 1.65;
+      color: #f8fafc;
+    }
+
+    .hero-definition strong {
+      color: #fde047;
+    }
+
+    .author-footer {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+    }
+
+    /* Interactive Word Breakdown Chips */
+    .example-chip {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: flex-start;
+      background: var(--surface);
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 0.45rem 0.85rem;
+      margin: 0.25rem 0.3rem 0.25rem 0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .example-chip:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+    }
+
+    .example-chip .fuge-highlight {
+      color: var(--accent);
+      font-weight: 800;
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+    }
+
+    .breakdown {
+      display: none;
+      margin-top: 0.35rem;
+      padding-top: 0.35rem;
+      border-top: 1px dashed #cbd5e1;
+      font-size: 0.84rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .example-chip.open .breakdown,
+    body.study-mode .breakdown {
+      display: block;
+    }
+
+    .breakdown span.part {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .breakdown span.fuge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      padding: 0.05rem 0.35rem;
+      border-radius: 5px;
+      margin: 0 0.15rem;
+    }
+
+    /* Slide 2 Grid */
+    .formation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.15rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-card {
+      background: var(--surface-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .form-card h3 {
+      font-size: 1.08rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .sub-item {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 0.85rem;
+    }
+
+    .sub-item strong {
+      display: block;
+      font-size: 0.93rem;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .sub-item p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .hint-bar {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Slide 3 Table */
+    .fuge-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .fuge-table th {
+      background: var(--primary);
+      color: #fff;
+      text-align: left;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.98rem;
+    }
+
+    .fuge-table td {
+      padding: 0.55rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .fuge-table tr:nth-child(even) td {
+      background: var(--surface-soft);
+    }
+
+    .fuge-badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 1rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 8px;
+      min-width: 75px;
+      text-align: center;
+    }
+
+    .fuge-badge.zero {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .fuge-badge.schwund {
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    /* Slide 4 Rules */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .rule-box {
+      border-radius: 14px;
+      padding: 1.3rem;
+      border: 1.5px solid;
+    }
+
+    .rule-box.yes {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    .rule-box.no {
+      background: #fff1f2;
+      border-color: #fda4af;
+    }
+
+    .rule-box h3 {
+      font-size: 1.12rem;
+      margin-bottom: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .rule-box.yes h3 {
+      color: #166534;
+    }
+
+    .rule-box.no h3 {
+      color: #9f1239;
+    }
+
+    .rule-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .rule-list li {
+      background: #fff;
+      padding: 0.7rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.94rem;
+      line-height: 1.45;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .suffix-pill {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 6px;
+      margin: 0.1rem;
+    }
+
+    .schwankend-box {
+      background: var(--amber-soft);
+      border: 1.5px solid #fcd34d;
+      border-radius: 12px;
+      padding: 0.95rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .schwankend-box strong {
+      color: var(--amber);
+      font-size: 1.02rem;
+    }
+
+    /* Slide 5 Interactive Exercise */
+    .exercise-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .ex-row {
+      background: var(--surface-soft);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      transition: all 0.2s ease;
+    }
+
+    .ex-row.correct {
+      background: #f0fdf4;
+      border-color: #22c55e;
+    }
+
+    .ex-row.partial {
+      background: #fffbeb;
+      border-color: #f59e0b;
+    }
+
+    .ex-row.wrong {
+      background: #fff1f2;
+      border-color: #f43f5e;
+    }
+
+    .ex-prompt {
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ex-inputs {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .ex-input-word {
+      flex: 1;
+      padding: 0.45rem 0.7rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.93rem;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .ex-input-word:focus,
+    .ex-select-fuge:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .ex-select-fuge {
+      padding: 0.45rem 0.55rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: var(--text);
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .ex-feedback {
+      font-size: 0.83rem;
+      font-weight: 600;
+      min-height: 1.1rem;
+    }
+
+    .ex-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #172554;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+      padding: 0.55rem 1.1rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .score-display {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    /* Footer Navigation */
+    footer {
+      background: rgba(255, 255, 255, 0.9);
+      border-top: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.3rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .nav-btn:not(:disabled):hover {
+      background: #172554;
+    }
+
+    .dots {
+      display: flex;
+      gap: 0.55rem;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .dot.active {
+      background: var(--primary);
+      transform: scale(1.25);
+    }
+
+    @media (max-width: 900px) {
+      .formation-grid,
+      .rules-grid,
+      .exercise-list {
+        grid-template-columns: 1fr;
+      }
+      .slide {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <span class="brand-badge">DaF</span>
+      <span>Fugenelemente</span>
+    </div>
+    <div class="header-controls">
+      <button id="studyModeBtn" class="toggle-btn" title="Alle Wortzerlegungen anzeigen">
+        🔍 Lernmodus: Aus
+      </button>
+      <div class="slide-counter" id="slideCounter">1 / 5</div>
+    </div>
+  </header>
+
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <main>
+    <div class="deck">
+
+      <!-- SLIDE 1: Titel & Definition -->
+      <section class="slide active" data-slide="1">
+        <div>
+          <span class="slide-tag">Deutsche Wortbildung</span>
+          <div class="hero-box">
+            <h1>FUGENELEMENTE</h1>
+            <div class="hero-question">🧩 Was ist ein Fugenelement (Fugenlaut)?</div>
+            <p class="hero-definition">
+              Fugenelemente sind kleine Laute oder Silben, die zwischen den Teilen von einem
+              <strong>zusammengesetzten Wort (Kompositum)</strong> stehen.<br><br>
+              Sie helfen, die Wörter <strong>leichter auszusprechen</strong> oder klingen <strong>„flüssiger“</strong>.
+            </p>
+          </div>
+        </div>
+        <div class="author-footer">
+          <span>✍️ Raquel Ocón Galilea</span>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Wie entstehen zusammengesetzte Wörter? -->
+      <section class="slide" data-slide="2">
+        <div>
+          <span class="slide-tag">Wortbildung</span>
+          <h2>🛠️ Wie entstehen zusammengesetzte Wörter im Deutschen?</h2>
+          <p class="subtitle">Beim Bilden von Komposita verändert sich das erste Wort (Vorderwort) manchmal:</p>
+
+          <div class="formation-grid">
+            <!-- 1. Ohne Fugenelement -->
+            <div class="form-card">
+              <h3>1. Ohne Fugenelement</h3>
+              <div class="sub-item">
+                <p>➤ Das erste Wort bleibt unverändert.</p>
+                <div>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Haustür</span>
+                    <span class="breakdown"><span class="part">das Haus</span> + <span class="part">die Tür</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Apfelsaft</span>
+                    <span class="breakdown"><span class="part">der Apfel</span> + <span class="part">der Saft</span></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Mit Fugenelement -->
+            <div class="form-card">
+              <h3>2. Mit Fugenelement (z. B. -s-, -n-, -e- usw.)</h3>
+
+              <div class="sub-item">
+                <strong>Mit Genitivform (häufig -s)</strong>
+                <p>➤ Das erste Wort sieht aus wie im Genitiv.</p>
+                <div>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Geburt<span class="fuge-highlight">s</span>tag</span>
+                    <span class="breakdown"><span class="part">die Geburt</span> + <span class="fuge">-s-</span> + <span class="part">der Tag</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Arbeit<span class="fuge-highlight">s</span>platz</span>
+                    <span class="breakdown"><span class="part">die Arbeit</span> + <span class="fuge">-s-</span> + <span class="part">der Platz</span></span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="sub-item">
+                <strong>Mit Pluralform als Fugenelement</strong>
+                <div>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Kind<span class="fuge-highlight">er</span>zimmer</span>
+                    <span class="breakdown"><span class="part">das Kind</span> (Pl. Kinder) + <span class="part">das Zimmer</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Blume<span class="fuge-highlight">n</span>laden</span>
+                    <span class="breakdown"><span class="part">die Blume</span> (Pl. Blumen) + <span class="part">der Laden</span></span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="sub-item">
+                <strong>Reiner Fugenlaut</strong>
+                <p>➤ Der Fugenlaut hat keine klare grammatische Funktion, aber hilft beim Sprechen.</p>
+                <div>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Maus<span class="fuge-highlight">e</span>loch</span>
+                    <span class="breakdown"><span class="part">die Maus</span> + <span class="fuge">-e-</span> + <span class="part">das Loch</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Sonne<span class="fuge-highlight">n</span>untergang</span>
+                    <span class="breakdown"><span class="part">die Sonne</span> + <span class="fuge">-n-</span> + <span class="part">der Untergang</span></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Schwundfuge -->
+            <div class="form-card">
+              <h3>3. Schwundfuge (Subtraktionsfuge)</h3>
+              <div class="sub-item">
+                <p>➤ Ein <strong>-e</strong> am Ende des Vorderworts fällt weg.</p>
+                <div>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Schulbus</span>
+                    <span class="breakdown"><span class="part">die Schule</span> (-e) + <span class="part">der Bus</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>🧾 Sprachkurs</span>
+                    <span class="breakdown"><span class="part">die Sprache</span> (-e) + <span class="part">der Kurs</span></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hint-bar">💡 Tipp: Klicke auf die Wörter, um die Wortteile mit Artikel zu sehen.</div>
+      </section>
+
+      <!-- SLIDE 3: Wichtige Fugenelemente im Überblick -->
+      <section class="slide" data-slide="3">
+        <div>
+          <span class="slide-tag">Übersicht</span>
+          <h2>📚 Wichtige Fugenelemente im Überblick</h2>
+          <p class="subtitle">Klicke auf die Beispiele, um die Bestandteile sichtbar zu machen.</p>
+
+          <table class="fuge-table">
+            <thead>
+              <tr>
+                <th style="width: 30%;">Fugenelement</th>
+                <th>Beispiel</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="fuge-badge">-s-</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Geburt<span class="fuge-highlight">s</span>tag</span>
+                    <span class="breakdown"><span class="part">die Geburt</span> + <span class="fuge">-s-</span> + <span class="part">der Tag</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Liebling<span class="fuge-highlight">s</span>farbe</span>
+                    <span class="breakdown"><span class="part">der Liebling</span> + <span class="fuge">-s-</span> + <span class="part">die Farbe</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge">-n- / -en-</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Sonne<span class="fuge-highlight">n</span>blume</span>
+                    <span class="breakdown"><span class="part">die Sonne</span> + <span class="fuge">-n-</span> + <span class="part">die Blume</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Tomate<span class="fuge-highlight">n</span>suppe</span>
+                    <span class="breakdown"><span class="part">die Tomate</span> + <span class="fuge">-n-</span> + <span class="part">die Suppe</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge">-er-</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Kind<span class="fuge-highlight">er</span>garten</span>
+                    <span class="breakdown"><span class="part">das Kind</span> + <span class="fuge">-er-</span> + <span class="part">der Garten</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Büch<span class="fuge-highlight">er</span>regal</span>
+                    <span class="breakdown"><span class="part">das Buch</span> + <span class="fuge">-er-</span> + <span class="part">das Regal</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge">-e-</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Hund<span class="fuge-highlight">e</span>leine</span>
+                    <span class="breakdown"><span class="part">der Hund</span> + <span class="fuge">-e-</span> + <span class="part">die Leine</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Schwein<span class="fuge-highlight">e</span>fleisch</span>
+                    <span class="breakdown"><span class="part">das Schwein</span> + <span class="fuge">-e-</span> + <span class="part">das Fleisch</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge">-ens-</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Leb<span class="fuge-highlight">ens</span>mittel</span>
+                    <span class="breakdown"><span class="part">das Leben</span> + <span class="fuge">-ens-</span> + <span class="part">das Mittel</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Herz<span class="fuge-highlight">ens</span>wunsch</span>
+                    <span class="breakdown"><span class="part">das Herz</span> + <span class="fuge">-ens-</span> + <span class="part">der Wunsch</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge zero">Ø (Nullfuge)</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Haustür</span>
+                    <span class="breakdown"><span class="part">das Haus</span> + <span class="fuge">Ø</span> + <span class="part">die Tür</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Tischlampe</span>
+                    <span class="breakdown"><span class="part">der Tisch</span> + <span class="fuge">Ø</span> + <span class="part">die Lampe</span></span>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="fuge-badge schwund">Schwundfuge (-e fällt weg)</span></td>
+                <td>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Kirschbaum</span>
+                    <span class="breakdown"><span class="part">die Kirsche</span> (-e) + <span class="part">der Baum</span></span>
+                  </span>
+                  <span class="example-chip" onclick="this.classList.toggle('open')">
+                    <span>Wollpullover</span>
+                    <span class="breakdown"><span class="part">die Wolle</span> (-e) + <span class="part">der Pullover</span></span>
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: Wann erscheint (k)eine Fuge? -->
+      <section class="slide" data-slide="4">
+        <div>
+          <span class="slide-tag">Regeln & Tendenzen</span>
+          <h2>🧠 Wann erscheint (k)eine Fuge?</h2>
+
+          <div class="rules-grid" style="margin-top: 1rem;">
+            <!-- Fuge möglich/typisch -->
+            <div class="rule-box yes">
+              <h3>✅ Fuge möglich / typisch bei:</h3>
+              <ul class="rule-list">
+                <li><strong>Substantiv + Substantiv</strong></li>
+                <li>
+                  <strong>Erstglied endet auf:</strong><br>
+                  <span class="suffix-pill">-tum</span>
+                  <span class="suffix-pill">-ling</span>
+                  <span class="suffix-pill">-ion</span>
+                  <span class="suffix-pill">-tät</span>
+                  <span class="suffix-pill">-heit</span>
+                  <span class="suffix-pill">-keit</span>
+                  <span class="suffix-pill">-schaft</span>
+                  <span class="suffix-pill">-sicht</span>
+                  <span class="suffix-pill">-ung</span><br>
+                  🧾 Beispiel: <strong>Frühling<span style="color:var(--accent)">s</span>erwachen</strong>, <strong>Hochzeit<span style="color:var(--accent)">s</span>kleid</strong>
+                </li>
+                <li>
+                  <strong>Substantiviertes Verb im Erstglied</strong><br>
+                  🧾 Beispiel: <strong>Schlaf<span style="color:var(--accent)">ens</span>zeit</strong>, <strong>Wissen<span style="color:var(--accent)">s</span>lücke</strong>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Keine Fuge -->
+            <div class="rule-box no">
+              <h3>🚫 Keine Fuge bei:</h3>
+              <ul class="rule-list">
+                <li><strong>Adjektiv + Substantiv</strong> (z. B.: Schwarztee, Hochhaus)</li>
+                <li><strong>Adverb + Substantiv</strong> (z. B.: Oberteil, Untergrund)</li>
+                <li><strong>Pronomen + Substantiv</strong> (z. B.: Jederzeit, manchmal)</li>
+                <li><strong>Erstglied endet auf -er, -el, Zischlaute (-sch, -ss, -z)</strong> (z. B.: Waschsalon, Paddelboot)</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="schwankend-box">
+            <div>
+              <strong>⚖️ Schwankender Gebrauch:</strong>
+              <p style="margin-top: 0.25rem; font-size: 0.96rem;">
+                Bei Wörtern wie <strong>Einkommen[s]steuer</strong>, <strong>Bahnhof[s]straße</strong> ist beides möglich: mit oder ohne <strong>-s-</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: Interaktive Übung -->
+      <section class="slide" data-slide="5">
+        <div>
+          <span class="slide-tag">Übung</span>
+          <h2>✍️ Komposita bilden & Fugenelement bestimmen</h2>
+          <p class="subtitle">Bilde aus den zwei Wörtern das Kompositum und wähle das richtige Fugenelement aus.</p>
+
+          <div class="exercise-list" id="exerciseList"></div>
+        </div>
+
+        <div class="ex-actions">
+          <div style="display: flex; gap: 0.65rem;">
+            <button class="btn-primary" id="checkBtn">Überprüfen</button>
+            <button class="btn-secondary" id="resetBtn">Zurücksetzen</button>
+          </div>
+          <div class="score-display" id="scoreDisplay"></div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <button class="nav-btn" id="prevBtn" disabled>← Zurück</button>
+    <div class="dots" id="dotsContainer"></div>
+    <button class="nav-btn" id="nextBtn">Weiter →</button>
+  </footer>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideCounter = document.getElementById('slideCounter');
+    const progressFill = document.getElementById('progressFill');
+    const dotsContainer = document.getElementById('dotsContainer');
+    const studyModeBtn = document.getElementById('studyModeBtn');
+
+    let currentSlide = 0;
+
+    // Create navigation dots
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (idx === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', `Folie ${idx + 1}`);
+      dot.addEventListener('click', () => goToSlide(idx));
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = Array.from(document.querySelectorAll('.dot'));
+
+    function goToSlide(index) {
+      if (index < 0 || index >= slides.length) return;
+      slides[currentSlide].classList.remove('active');
+      dots[currentSlide].classList.remove('active');
+
+      currentSlide = index;
+
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === slides.length - 1;
+
+      slideCounter.textContent = `${currentSlide + 1} / ${slides.length}`;
+      progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    }
+
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // Keyboard navigation (ignore when typing in input/select)
+    document.addEventListener('keydown', (e) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+      if (e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+      if (e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+    });
+
+    // Study mode toggle
+    studyModeBtn.addEventListener('click', () => {
+      const isStudy = document.body.classList.toggle('study-mode');
+      studyModeBtn.classList.toggle('active', isStudy);
+      studyModeBtn.textContent = isStudy ? '🔍 Lernmodus: Ein' : '🔍 Lernmodus: Aus';
+    });
+
+    // Interactive Exercise Data
+    const exercises = [
+      {
+        prompt: "die Sonne + die Brille",
+        answerWord: "Sonnenbrille",
+        answerFuge: "-n- / -en-"
+      },
+      {
+        prompt: "die Schokolade + der Kuchen",
+        answerWord: "Schokoladenkuchen",
+        answerFuge: "-n- / -en-"
+      },
+      {
+        prompt: "der Regen + der Schirm",
+        answerWord: "Regenschirm",
+        answerFuge: "Ø (Nullfuge)"
+      },
+      {
+        prompt: "die Arbeit + der Platz",
+        answerWord: "Arbeitsplatz",
+        answerFuge: "-s-"
+      },
+      {
+        prompt: "das Kind + der Garten",
+        answerWord: "Kindergarten",
+        answerFuge: "-er-"
+      },
+      {
+        prompt: "der Hund + die Hütte",
+        answerWord: "Hundehütte",
+        answerFuge: "-e-"
+      },
+      {
+        prompt: "das Leben + das Mittel",
+        answerWord: "Lebensmittel",
+        answerFuge: "-ens-"
+      },
+      {
+        prompt: "der Tisch + die Lampe",
+        answerWord: "Tischlampe",
+        answerFuge: "Ø (Nullfuge)"
+      }
+    ];
+
+    const fugeOptions = [
+      "Fugenelement wählen...",
+      "-s-",
+      "-n- / -en-",
+      "-er-",
+      "-e-",
+      "-ens-",
+      "Ø (Nullfuge)"
+    ];
+
+    const exerciseList = document.getElementById('exerciseList');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+
+    function renderExercises() {
+      exerciseList.innerHTML = '';
+      scoreDisplay.textContent = '';
+
+      exercises.forEach((ex, idx) => {
+        const row = document.createElement('div');
+        row.className = 'ex-row';
+        row.id = `ex-row-${idx}`;
+
+        const optionsHtml = fugeOptions
+          .map((opt, oIdx) => `<option value="${oIdx === 0 ? '' : opt}">${opt}</option>`)
+          .join('');
+
+        row.innerHTML = `
+          <div class="ex-prompt">
+            <span>${idx + 1}. ${ex.prompt}</span>
+          </div>
+          <div class="ex-inputs">
+            <input type="text" class="ex-input-word" id="word-${idx}" placeholder="z. B. Haustür" autocomplete="off" />
+            <select class="ex-select-fuge" id="fuge-${idx}">
+              ${optionsHtml}
+            </select>
+          </div>
+          <div class="ex-feedback" id="fb-${idx}"></div>
+        `;
+
+        exerciseList.appendChild(row);
+      });
+    }
+
+    document.getElementById('checkBtn').addEventListener('click', () => {
+      let perfectCount = 0;
+
+      exercises.forEach((ex, idx) => {
+        const row = document.getElementById(`ex-row-${idx}`);
+        const wordInput = document.getElementById(`word-${idx}`).value.trim();
+        const fugeSelect = document.getElementById(`fuge-${idx}`).value;
+        const fb = document.getElementById(`fb-${idx}`);
+
+        const wordCorrect = wordInput.toLowerCase() === ex.answerWord.toLowerCase();
+        const fugeCorrect = fugeSelect === ex.answerFuge;
+
+        row.classList.remove('correct', 'partial', 'wrong');
+
+        if (wordCorrect && fugeCorrect) {
+          perfectCount++;
+          row.classList.add('correct');
+          fb.style.color = '#15803d';
+          fb.textContent = `✅ Richtig! ${ex.answerWord} (${ex.answerFuge})`;
+        } else if (wordCorrect || fugeCorrect) {
+          row.classList.add('partial');
+          fb.style.color = '#b45309';
+          fb.textContent = `⚠️ Teilweise richtig → Lösung: ${ex.answerWord} (${ex.answerFuge})`;
+        } else {
+          row.classList.add('wrong');
+          fb.style.color = '#be123c';
+          fb.textContent = `❌ Lösung: ${ex.answerWord} (${ex.answerFuge})`;
+        }
+      });
+
+      scoreDisplay.textContent = `Ergebnis: ${perfectCount} von ${exercises.length} komplett richtig`;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', renderExercises);
+
+    renderExercises();
+  </script>
+</body>
+</html>
